@@ -1,0 +1,40 @@
+/* CenteredDiv.css */
+.home-container {
+  display: flex;
+  justify-content: center;
+  height: 100vh; /* Full viewport height */
+  align-items: flex-start; /* Align items to the top */
+}
+
+.home {
+  padding: 2em;
+  top: 30px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.top-half {
+    justify-content: space-evenly;
+    display: flex;
+}
+
+.enter-ing-form {
+    display: inline-block;
+}
+
+.form-group {
+    margin-bottom: 1em;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 0.5em;
+  }
+  
+  input {
+    display: block;
+    margin-top: 0.5em;
+    width: 100%;
+    padding: 0.5em;
+    box-sizing: border-box;
+  }

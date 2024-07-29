@@ -50,7 +50,7 @@
     z-index: 4; /* Higher z-index to overlap other shapes */
     background-color: white;
     filter: drop-shadow(
-      1px 2px 8px #748561
+      1px 2px 8px #647254
     );
     border-radius: 5px;
   }
