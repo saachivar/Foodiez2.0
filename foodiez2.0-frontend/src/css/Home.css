@@ -1,40 +1,116 @@
-/* CenteredDiv.css */
+/* Home.css */
+
 .home-container {
-  display: flex;
-  justify-content: center;
-  height: 100vh; /* Full viewport height */
-  align-items: flex-start; /* Align items to the top */
+    display: flex;
+    justify-content: center;
+    height: 80vh;
+    width: 100%;
 }
 
 .home {
-  padding: 2em;
-  top: 30px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding-left: 1.7em;
+    padding-right: 1.7em;
+    padding-top: 1.5em;
+    border-radius: 5px;
+    width: 92%; /* Example width */
+    max-width: 100%; /* Example max width */
 }
 
 .top-half {
-    justify-content: space-evenly;
     display: flex;
+    justify-content: space-between; 
+    align-items: top;
+    width: 100%;
 }
 
-.enter-ing-form {
-    display: inline-block;
+.enter-ing, .paste-link {
+    flex: 1;
+    margin: 1em;
+    display: flex;
+    flex-direction: column;
+}
+
+.or {
+    text-align: center;
+    margin: 0 2em;
+    font-style: italic;
+    font-size: 30px;
+    margin-top: 30px;
 }
 
 .form-group {
-    margin-bottom: 1em;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 0.5em;
-  }
-  
-  input {
-    display: block;
-    margin-top: 0.5em;
+    display: flex;
+    flex-direction: column;
     width: 100%;
+}
+
+.form-group label {
+    flex: 0;
+}
+
+.form-group input{
+    flex: 1;
+    width: 100%; /* Ensures input takes the full width of its container */
     padding: 0.5em;
     box-sizing: border-box;
-  }
+    border-radius: 10px;
+    border: 1px solid black;
+    font-family: 'Montserrat';
+    font-size: 17px;
+}
+
+
+.paste-link-input input {
+    width: 100%;
+}
+
+.paste-link-form {
+    align-items: flex-end; /* Aligns the items to the right */
+    text-align: right; /* Ensures the text aligns to the right */
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5em;
+}
+
+.enter-ing-form-input textarea {
+    border-radius: 10px;
+    border: 1px solid black;
+    height: 150px;
+    resize: none;
+    font-family: 'Montserrat';
+    font-size: 17px;
+    padding: .5em;
+}
+
+.bottom-half {
+    margin-left: 20px;
+    max-width: 800px;
+    display: flex;
+}
+
+.forms-on-bottom {
+    width: 550px;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
+
+button {
+    background-color: #FBFFF8;
+    min-width: 190px;
+    max-width: 220px;
+    font-family: 'Montserrat';
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 1px solid #29671A;
+    font-size: 17px;
+    border-radius: 30px;
+    padding: 10px;
+}
+
+
