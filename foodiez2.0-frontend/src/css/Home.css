@@ -86,7 +86,7 @@ label {
 
 .bottom-half {
     margin-left: 20px;
-    max-width: 800px;
+    max-width: 1200px;
     display: flex;
 }
 
@@ -111,6 +111,16 @@ button {
     font-size: 17px;
     border-radius: 30px;
     padding: 10px;
+}
+button:hover {
+    cursor: pointer
+}
+.nutrition-info {
+    border: 1px solid black;
+    height: 100px;
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 10px;
 }
 
 

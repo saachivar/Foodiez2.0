@@ -1,4 +1,4 @@
-import { useState } from 'react'; // Import useState
+import { useState, useEffect } from 'react'; // Import useState
 import { useNavigate } from 'react-router-dom'; // Import useNavigate if needed
 import NavBar from './Components/NavBar';
 import './css/Home.css'
@@ -9,33 +9,75 @@ export default function Home() {
   const [recipeLink, setRecipeLink] = useState('');
   const [recipeName, setRecipeName] = useState('');
   const [recipeDescription, setRecipeDescription] = useState('');
+  const [nutritionInfo, setNutritionInfo] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate if needed
   const sendRecipeLink = () => {
-    const data = {
-      ingredients: ingredients
-    };
+    if (recipeLink == '') {
+      alert("Please input a link to a recipe!");
+    } else {
 
-    fetch('http://127.0.0.1:5000/ingredients', {
-      mode: 'cors',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      alert(data)
-    })
-    .catch(error => {
-      console.error('There was a problem with your fetch operation:', error);
-    });
+      fetch('http://127.0.0.1:5000/ingredients', {
+        mode: 'cors',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(recipeLink),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          // Join the array elements with a newline character
+          setIngredients(data.join('\n'));
+        } else {
+          alert('Failed to get ingredients');
+        }
+      })
+      .catch(error => {
+        console.error('There was a problem with your fetch operation:', error);
+      }); 
+    }
   };
+  const sendIngredients = () => {
+    if (ingredients == '') {
+      alert("Please input some ingredients!");
+    } else {
+
+      fetch('http://127.0.0.1:5000/nutrition', {
+        mode: 'cors',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(ingredients),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setNutritionInfo(data)
+        console.log(data)
+        alert(data)
+      })
+      .catch(error => {
+        console.error('There was a problem with your fetch operation:', error);
+      }); 
+    }
+  };
+
+  // Call fetchNutritionInfo when the component mounts
+  useEffect(() => {
+    sendIngredients();
+  }, []);
+
   return (
         <div>
         <NavBar />
@@ -70,7 +112,7 @@ export default function Home() {
                       />
                     </div>
                   </form>
-                  <button onClick={sendRecipeLink()}type="button" style={{marginTop: '15px' }} >GET INGREDIENTS</button>
+                  <button onClick={sendRecipeLink} type="button" style={{marginTop: '15px' }} >GET INGREDIENTS</button>
                 </div>
               </div>
               <div className="bottom-half">
@@ -90,8 +132,25 @@ export default function Home() {
                     </form>
                   </div>
                   <div className="buttons">
-                    <button type="button" style={{marginBottom: '10px' }}>GET NUTRITION INFO</button>
+                    <button onClick={sendIngredients} type="button" style={{marginBottom: '10px' }}>GET NUTRITION INFO</button>
                     <button type="button" style={{marginTop: '10px' }}>SAVE RECIPE</button>
+                  </div>
+                  <div className="nutrition">
+                    <div className="label"> Nutrition info will appear here:</div>
+                    <div className="nutrition-info">
+                      {Object.keys(nutritionInfo).length === 0 ? (
+                        <p>Loading...</p>
+                      ) : (
+                        <div>
+                          <p>Calories: {nutritionInfo.Calories}</p>
+                          <p>Total Weight: {nutritionInfo["Total Weight (g)"]}</p>
+                          <h4>Total Nutrients:</h4>
+                          {Object.entries(nutritionInfo["Total Nutrients"]).map(([key, value]) => (
+                            <p key={key}>{key}: {value.quantity} {value.unit}</p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
               </div>
             </div>
