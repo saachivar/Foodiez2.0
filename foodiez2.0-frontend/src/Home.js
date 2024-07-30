@@ -1,10 +1,41 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react'; // Import useState
+import { useNavigate } from 'react-router-dom'; // Import useNavigate if needed
 import NavBar from './Components/NavBar';
 import './css/Home.css'
 
 
 export default function Home() {
+  const [ingredients, setIngredients] = useState('');
+  const [recipeLink, setRecipeLink] = useState('');
+  const [recipeName, setRecipeName] = useState('');
+  const [recipeDescription, setRecipeDescription] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate if needed
+  const sendRecipeLink = () => {
+    const data = {
+      ingredients: ingredients
+    };
 
+    fetch('http://127.0.0.1:5000/ingredients', {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      alert(data)
+    })
+    .catch(error => {
+      console.error('There was a problem with your fetch operation:', error);
+    });
+  };
   return (
         <div>
         <NavBar />
@@ -15,7 +46,12 @@ export default function Home() {
                   <form className='enter-ing-form'>
                     <div className="form-group enter-ing-form-input">
                       <label>Enter the ingredients to your custom recipe:</label>
-                      <textarea className="enter-ing-input" />
+                      <textarea
+                        placeholder="Put each ingredient on a new line and format it like: 3 cups flour"
+                        className="enter-ing-input"
+                        value={ingredients}
+                        onChange={(e) => setIngredients(e.target.value)}
+                      />
                     </div>
                   </form>
                 </div>
@@ -26,10 +62,15 @@ export default function Home() {
                   <form>
                     <div className="form-group paste-link-form">
                       <label>Paste a link to a recipe here:</label>
-                      <input className="paste-link-input" type="text" />
+                      <input
+                        className="paste-link-input"
+                        type="text"
+                        value={recipeLink}
+                        onChange={(e) => setRecipeLink(e.target.value)}
+                      />
                     </div>
                   </form>
-                  <button type="button" style={{marginTop: '15px' }} >GET INGREDIENTS</button>
+                  <button onClick={sendRecipeLink()}type="button" style={{marginTop: '15px' }} >GET INGREDIENTS</button>
                 </div>
               </div>
               <div className="bottom-half">
