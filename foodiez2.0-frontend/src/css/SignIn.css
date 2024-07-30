@@ -1,0 +1,13 @@
+.sign-in-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.sign-in-box {
+    padding: 30px;
+    border: 1px solid rgb(34, 93, 11);
+    border-radius: 15px;
+    box-shadow: 1px 1px 6px rgb(34, 74, 33);
+}
