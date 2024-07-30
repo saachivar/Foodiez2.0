@@ -12,7 +12,7 @@ export default function Home() {
   const [nutritionInfo, setNutritionInfo] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate if needed
   const sendRecipeLink = () => {
-    if (recipeLink == '') {
+    if (recipeLink === '') {
       alert("Please input a link to a recipe!");
     } else {
 
@@ -44,7 +44,7 @@ export default function Home() {
     }
   };
   const sendIngredients = () => {
-    if (ingredients == '') {
+    if (ingredients === '') {
       alert("Please input some ingredients!");
     } else {
 
@@ -64,8 +64,6 @@ export default function Home() {
       })
       .then(data => {
         setNutritionInfo(data)
-        console.log(data)
-        alert(data)
       })
       .catch(error => {
         console.error('There was a problem with your fetch operation:', error);
@@ -73,10 +71,6 @@ export default function Home() {
     }
   };
 
-  // Call fetchNutritionInfo when the component mounts
-  useEffect(() => {
-    sendIngredients();
-  }, []);
 
   return (
         <div>
@@ -120,7 +114,7 @@ export default function Home() {
                     <form className='enter-ing-form'>
                       <div className="form-group enter-ing-form-input">
                         <label>Enter the name of your recipe:</label>
-                        <input className="enter-ing-input" />
+                        <input placeholder="Ex: My rad chocolate fudge cookies" className="enter-ing-input" />
                       </div>
                     </form>
                     <form className='enter-ing-form' style={{marginTop: '20px' }}>
@@ -139,15 +133,10 @@ export default function Home() {
                     <div className="label"> Nutrition info will appear here:</div>
                     <div className="nutrition-info">
                       {Object.keys(nutritionInfo).length === 0 ? (
-                        <p>Loading...</p>
+                        <p>Press the GET NUTRITION INFO button after you input your ingredients! </p>
                       ) : (
                         <div>
-                          <p>Calories: {nutritionInfo.Calories}</p>
-                          <p>Total Weight: {nutritionInfo["Total Weight (g)"]}</p>
-                          <h4>Total Nutrients:</h4>
-                          {Object.entries(nutritionInfo["Total Nutrients"]).map(([key, value]) => (
-                            <p key={key}>{key}: {value.quantity} {value.unit}</p>
-                          ))}
+                          <pre>{nutritionInfo}</pre>
                         </div>
                       )}
                     </div>
