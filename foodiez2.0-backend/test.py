@@ -17,7 +17,7 @@ collection = db['test']
 document = {"name": "sktech", "city": "pune"}
 insert_doc = collection.insert_one(document)
 
-print("inserted")
+print("inserted ")
 
 # Send a ping to confirm a successful connection
 try:
