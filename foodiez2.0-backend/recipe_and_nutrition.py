@@ -6,7 +6,8 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
 app = Flask(__name__)
-CORS(app, resources={r"/nutrition": {"origins": "http://localhost:3000"}, r"/ingredients": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/nutrition": {"origins": "http://localhost:3000"}, r"/ingredients": {"origins": "http://localhost:3000"}, 
+                     r"/signin": {"origins": "http://localhost:3000/sign-in"}, r"/signup": {"origins": "http://localhost:3000/sign-up"}})
 
 
 # MongoDB connection
@@ -38,8 +39,10 @@ def signin():
 
     if user and user["password"] == password:
         return jsonify({"message": "Sign-in successful"}), 200
+    elif user:
+        return jsonify({"message": "Invalid credentials"}), 200
     else:
-        return jsonify({"message": "Invalid credentials"}), 401
+        return jsonify({"message:": "You don't have an account. Please create one"}), 401
 
 
 
@@ -134,6 +137,23 @@ def nutrition():
         
     print(nutrition_string)
     return jsonify(nutrition_string)
+
+# Sign-up route (optional, for creating new users)
+@app.route('/signup', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type','application/json'])
+def signup():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+
+    # Check if the user already exists
+    if users_collection.find_one({"username": username}):
+        return jsonify({"message": "Username already exists"}), 409
+
+    # Insert the new user into the database
+    users_collection.insert_one({"username": username, "password": password})
+    return jsonify({"message": "User created successfully"}), 201
+
 
     
 if __name__ == '__main__':

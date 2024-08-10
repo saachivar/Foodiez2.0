@@ -2,17 +2,14 @@
 import './css/SignIn.css'
 import React, { useState } from 'react';
 import NavBar from './Components/NavBar';
-import { useNavigate } from 'react-router-dom';
-  
 
-const SignIn = ({ onSignIn }) => {
-  const navigate = useNavigate();
+const SignUp = ({ onSignUp }) => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
 
-  const handleSignIn = async () => {
+  const handleSignUp = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/signin', {
+      const response = await fetch('http://127.0.0.1:5000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,12 +20,11 @@ const SignIn = ({ onSignIn }) => {
       if (!response.ok) throw new Error('Sign-in failed');
       
       const data = await response.json();
-      console.log(data);
-      //onSignIn(data); // Handle sign-in success, e.g., save token or user info
+      console.log(data)
+      //onSignUp(data); // Handle sign-in success, e.g., save token or user info
     } catch (error) {
-      console.log(error);
-      alert("No account found. Sign up instead!");
-      navigate("/sign-up");
+        console.log(error)
+      alert("No account found. Sign up here!")
     }
   };
 
@@ -37,7 +33,7 @@ const SignIn = ({ onSignIn }) => {
       <NavBar />
       <div className="sign-in-container">
           <div className="sign-in-box">
-              <h2>Sign In</h2>
+              <h2>Sign Up</h2>
               <input
                   type="username"
                   placeholder="Username"
@@ -50,11 +46,11 @@ const SignIn = ({ onSignIn }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
               />
-              <button onClick={handleSignIn}>Sign In</button>
+              <button onClick={handleSignUp}>Create Account</button>
           </div>
       </div>
     </div>
   );
 };
 
-export default SignIn;
+export default SignUp;
