@@ -8,18 +8,15 @@ from pymongo.server_api import ServerApi
 app = Flask(__name__)
 CORS(app, resources={r"/nutrition": {"origins": "http://localhost:3000"}, r"/ingredients": {"origins": "http://localhost:3000"}})
 
-uri = "mongodb+srv://weewoo0413:wqqdy8fq4@cluster0.lbqcyam.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-# Create a new client and connect to the server
+# MongoDB connection
+uri = "mongodb+srv://weewoo0413:wqqdy8fq4@cluster0.lbqcyam.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(uri, server_api=ServerApi('1'))
 
-db = client['db1']
-collection = db['test']
+db = client.get_database("Foodiez2")  # Replace with your database name
+users_collection = db.get_collection("users")  # Collection to store user data
 
-document = {"name": "sktech", "city": "pune"}
-insert_doc = collection.insert_one(document)
 
-print("inserted")
 
 # Send a ping to confirm a successful connection
 try:
@@ -31,8 +28,18 @@ except Exception as e:
 @app.route('/signin', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type','application/json'])
 def signin():
-    print("deez nuts")
-    return
+    print("sign in received")
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+
+    # Query the database for the user
+    user = users_collection.find_one({"username": username})
+
+    if user and user["password"] == password:
+        return jsonify({"message": "Sign-in successful"}), 200
+    else:
+        return jsonify({"message": "Invalid credentials"}), 401
 
 
 

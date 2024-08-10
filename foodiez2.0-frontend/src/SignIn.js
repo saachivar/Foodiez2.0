@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import NavBar from './Components/NavBar';
 
 const SignIn = ({ onSignIn }) => {
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
 
@@ -15,7 +14,7 @@ const SignIn = ({ onSignIn }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email,username,  password }),
+        body: JSON.stringify({ username,  password }),
       });
 
       if (!response.ok) throw new Error('Sign-in failed');
@@ -33,12 +32,6 @@ const SignIn = ({ onSignIn }) => {
       <div className="sign-in-container">
           <div className="sign-in-box">
               <h2>Sign In</h2>
-              <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-              />
               <input
                   type="username"
                   placeholder="Username"

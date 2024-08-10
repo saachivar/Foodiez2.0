@@ -11,11 +11,6 @@ uri = "mongodb+srv://weewoo0413:wqqdy8fq4@cluster0.lbqcyam.mongodb.net/?retryWri
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
 
-db = client['db1']
-collection = db['test']
-
-document = {"name": "sktech", "city": "pune"}
-insert_doc = collection.insert_one(document)
 
 print("inserted")
 
