@@ -9,6 +9,17 @@ const SignIn = ({ onSignIn }) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [isInvalid, setIsInvalid] = useState(false);
+  
+  function InvalidCredentials(isInvalid) {
+    if (isInvalid) {
+      return (
+        <div className="invalidBox">
+          <p>Your credentials are invalid. Please try again. </p>
+        </div>
+      )
+    }
+  }
 
   const handleSignIn = async () => {
     try {
@@ -24,11 +35,17 @@ const SignIn = ({ onSignIn }) => {
       
       const data = await response.json();
       console.log(data);
+      if (data.message === "Invalid credentials") {
+        setIsInvalid(true)
+      } else {
+        setIsInvalid(false)
+        console.log(data.message)
+        navigate("/saved-recipes")
+      }
       //onSignIn(data); // Handle sign-in success, e.g., save token or user info
     } catch (error) {
-      console.log(error);
-      alert("No account found. Sign up instead!");
-      navigate("/sign-up");
+        alert("No account found. Sign up instead!");
+        navigate("/sign-up");
     }
   };
 
@@ -52,7 +69,9 @@ const SignIn = ({ onSignIn }) => {
               />
               <button onClick={handleSignIn}>Sign In</button>
           </div>
+          <InvalidCredentials isInvalid={isInvalid} />
       </div>
+      
     </div>
   );
 };

@@ -17,6 +17,9 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 db = client.get_database("Foodiez2")  # Replace with your database name
 users_collection = db.get_collection("users")  # Collection to store user data
 
+app.secret_key = 'your_secret_key'  # Required to sign the session cookie
+
+
 
 
 # Send a ping to confirm a successful connection
@@ -38,6 +41,7 @@ def signin():
     user = users_collection.find_one({"username": username})
 
     if user and user["password"] == password:
+        session['user'] = username  # Store the username in session
         return jsonify({"message": "Sign-in successful"}), 200
     elif user:
         return jsonify({"message": "Invalid credentials"}), 200
