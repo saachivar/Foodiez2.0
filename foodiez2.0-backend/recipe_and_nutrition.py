@@ -1,13 +1,12 @@
 import requests
 from recipe_scrapers import scrape_html
 from flask_cors import CORS, cross_origin
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
 app = Flask(__name__)
-CORS(app, resources={r"/nutrition": {"origins": "http://localhost:3000"}, r"/ingredients": {"origins": "http://localhost:3000"}, 
-                     r"/signin": {"origins": "http://localhost:3000/sign-in"}, r"/signup": {"origins": "http://localhost:3000/sign-up"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 # MongoDB connection
@@ -29,6 +28,16 @@ try:
 except Exception as e:
     print(e)
 
+@app.route('/user-recipes', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type','application/json'])
+def user():
+    if "user" in session:
+        user = session["user"]
+        return jsonify(user)
+    else: 
+        return "False"
+    
+
 @app.route('/signin', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type','application/json'])
 def signin():
@@ -36,17 +45,24 @@ def signin():
     data = request.json
     username = data.get('username')
     password = data.get('password')
+    print (username)
+    print (password)
 
     # Query the database for the user
     user = users_collection.find_one({"username": username})
+    print(user)
+    print(user["password"])
 
     if user and user["password"] == password:
+        print("yes have")
         session['user'] = username  # Store the username in session
         return jsonify({"message": "Sign-in successful"}), 200
     elif user:
+        print("inavlid")
         return jsonify({"message": "Invalid credentials"}), 200
     else:
-        return jsonify({"message:": "You don't have an account. Please create one"}), 401
+        print("no have")
+        return jsonify({"message": "You don't have an account. Please create one"}), 401
 
 
 

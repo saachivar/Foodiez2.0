@@ -21,34 +21,40 @@ const SignIn = ({ onSignIn }) => {
     }
   }
 
+
   const handleSignIn = async () => {
     try {
       const response = await fetch('http://127.0.0.1:5000/signin', {
+        mode: 'cors',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username,  password }),
+        body: JSON.stringify({ username, password }),
       });
-
-      if (!response.ok) throw new Error('Sign-in failed');
-      
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
       const data = await response.json();
       console.log(data);
-      if (data.message === "Invalid credentials") {
-        setIsInvalid(true)
+  
+      if (data.message === "Sign-in successful") {
+        console.log(data.message);
+        navigate("/saved-recipes");
       } else {
-        setIsInvalid(false)
-        console.log(data.message)
-        navigate("/saved-recipes")
+        console.log(data.message);
+        setIsInvalid(true);
       }
-      //onSignIn(data); // Handle sign-in success, e.g., save token or user info
+  
     } catch (error) {
-        alert("No account found. Sign up instead!");
-        navigate("/sign-up");
+      console.log(error);
+      alert("It seems you don't have an account. Sign up for one!");
+      navigate("/sign-up");
     }
   };
-
+  
   return (
     <div>
       <NavBar />
