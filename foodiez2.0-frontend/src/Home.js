@@ -11,6 +11,33 @@ export default function Home() {
   const [recipeDescription, setRecipeDescription] = useState('');
   const [nutritionInfo, setNutritionInfo] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate if needed
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/is-signed-in', {
+          mode: 'cors',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',  // Include credentials (cookies) in the request
+        });
+        const data = await response.json();
+        console.log(data);
+        setIsLoggedIn(data.isLoggedIn);
+        if (data.isLoggedIn) {
+          setUsername(data.username);  // Save the username if logged in
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
   const sendRecipeLink = () => {
     if (recipeLink === '') {
       alert("Please input a link to a recipe!");
@@ -70,6 +97,38 @@ export default function Home() {
       }); 
     }
   };
+  const saveRecipe = () => {
+    if (!isLoggedIn) {
+      alert("Please sign in before you save a recipe!")
+    } else {
+        fetch('http://127.0.0.1:5000/save-recipe', {
+          mode: 'cors',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(recipeLink,recipeName,recipeDescription,nutritionInfo)
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (Array.isArray(data)) {
+            // Join the array elements with a newline character
+            setIngredients(data.join('\n'));
+          } else {
+            alert('Failed to get ingredients');
+          }
+        })
+        .catch(error => {
+          console.error('There was a problem with your fetch operation:', error);
+        }); 
+      }
+    
+  }
 
 
   return (
@@ -114,20 +173,27 @@ export default function Home() {
                     <form className='enter-ing-form'>
                       <div className="form-group enter-ing-form-input">
                         <label>Enter the name of your recipe:</label>
-                        <input placeholder="Ex: My rad chocolate fudge cookies" className="enter-ing-input" />
+                        <input 
+                          placeholder="Ex: My rad chocolate fudge cookies"
+                          className="enter-ing-input"
+                          value={recipeName}
+                          onChange={(e) => setRecipeName(e.target.value)} />
                       </div>
                     </form>
                     <form className='enter-ing-form' style={{marginTop: '20px' }}>
                       <div className="form-group enter-ing-form-input">
                         <label>Write down your recipe here!:</label>
                         <label style={{fontSize: '15px', marginTop: '-10px' }}>(or any notes about your recipe if you copied a link)</label>
-                        <textarea className="enter-ing-input" />
+                        <textarea 
+                          value={recipeDescription}
+                          className="enter-ing-input" 
+                          onChange={(e) => setRecipeDescription(e.target.value)}/>
                       </div>
                     </form>
                   </div>
                   <div className="buttons">
                     <button onClick={sendIngredients} type="button" style={{marginBottom: '10px' }}>GET NUTRITION INFO</button>
-                    <button type="button" style={{marginTop: '10px' }}>SAVE RECIPE</button>
+                    <button onClick={saveRecipe} type="button" style={{marginTop: '10px' }}>SAVE RECIPE</button>
                   </div>
                   <div className="nutrition">
                     <div className="label"> Nutrition info will appear here:</div>

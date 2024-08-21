@@ -4,9 +4,20 @@ from flask_cors import CORS, cross_origin
 from flask import Flask, request, jsonify, session
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+import os
+
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/nutrition": {"origins": "http://localhost:3000"}, r"/ingredients": {"origins": "http://localhost:3000"},
+                     r"/signin": {"origins": "http://localhost:3000/sign-in"}, r"/is-signed-in": {"origins": "http://localhost:3000/saved-recipes"}
+                     , r"/is-signed-in": {"origins": "http://localhost:3000/"}, r"/logout": {"origins": "http://localhost:3000/log-out", }
+                     ,  r"/save-recipe": {"origins": "http://localhost:3000/"}})
+
+app.config.update(
+    SESSION_COOKIE_SAMESITE='None',
+    SESSION_COOKIE_SECURE=True
+)
+
 
 
 # MongoDB connection
@@ -16,7 +27,7 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 db = client.get_database("Foodiez2")  # Replace with your database name
 users_collection = db.get_collection("users")  # Collection to store user data
 
-app.secret_key = 'your_secret_key'  # Required to sign the session cookie
+app.secret_key = os.urandom(24)  # Required to sign the session cookie
 
 
 
@@ -28,25 +39,35 @@ try:
 except Exception as e:
     print(e)
 
-@app.route('/user-recipes', methods=['POST'])
-@cross_origin(origin='*',headers=['Content-Type','application/json'])
+@app.route('/is-signed-in', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type','application/json'], supports_credentials=True  )
 def user():
+    print(session)
+    print(session.get('user'))
     if "user" in session:
         user = session["user"]
-        return jsonify(user)
+        print(session)
+        return jsonify({"isLoggedIn": True, "username": user})
     else: 
-        return "False"
-    
+        return jsonify({"isLoggedIn": False})
+
+@app.route('/logout', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type','application/json'], supports_credentials=True)
+def logout():
+    session.pop('user', None)
+    session.modified = True  # Ensure the session is marked as modified
+    print("popped")
+    print(session)
+    return jsonify({"message": "Sign-out successful"}), 200
 
 @app.route('/signin', methods=['POST'])
-@cross_origin(origin='*',headers=['Content-Type','application/json'])
+@cross_origin(origin='*',headers=['Content-Type','application/json'], supports_credentials=True)
 def signin():
+    print(session)
     print("sign in received")
     data = request.json
     username = data.get('username')
     password = data.get('password')
-    print (username)
-    print (password)
 
     # Query the database for the user
     user = users_collection.find_one({"username": username})
@@ -56,7 +77,10 @@ def signin():
     if user and user["password"] == password:
         print("yes have")
         session['user'] = username  # Store the username in session
-        return jsonify({"message": "Sign-in successful"}), 200
+        print(session.get('user'))
+        print(session)
+        response = jsonify({"message": "Sign-in successful"}), 200
+        return response;
     elif user:
         print("inavlid")
         return jsonify({"message": "Invalid credentials"}), 200
@@ -69,6 +93,11 @@ def signin():
 @app.route('/')
 def home():
     return "Welcome to the Score Predictor API!"
+
+@app.route('/save-recipe', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type','application/json'])
+def saveRecipe():
+    print(request.json)
 
 @app.route('/ingredients', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type','application/json'])
@@ -168,7 +197,7 @@ def signup():
 
     # Check if the user already exists
     if users_collection.find_one({"username": username}):
-        return jsonify({"message": "Username already exists"}), 409
+        return jsonify({"message": "Username already exists"}), 200
 
     # Insert the new user into the database
     users_collection.insert_one({"username": username, "password": password})

@@ -5,6 +5,7 @@ import SavedRecipes from './SavedRecipes.js'
 import Background from './Background.js';
 import SignIn from './SignIn.js';
 import SignUp from './SignUp.js';
+import Logout from './Logout.js';
 
 const App = () => {
   const routes = useRoutes([
@@ -14,7 +15,8 @@ const App = () => {
         { path: '/', element: <Home /> },
         { path: '/saved-recipes', element: <SavedRecipes /> },
         { path: '/sign-in', element: <SignIn />},
-        { path: '/sign-up', element: <SignUp />}
+        { path: '/sign-up', element: <SignUp />},
+        { path: '/log-out', element: <Logout />}
       ]
     }
   ]);

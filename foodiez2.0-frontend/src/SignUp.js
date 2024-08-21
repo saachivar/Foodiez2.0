@@ -2,8 +2,10 @@
 import './css/SignIn.css'
 import React, { useState } from 'react';
 import NavBar from './Components/NavBar';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = ({ onSignUp }) => {
+  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
 
@@ -21,7 +23,13 @@ const SignUp = ({ onSignUp }) => {
       
       const data = await response.json();
       console.log(data)
-      //onSignUp(data); // Handle sign-in success, e.g., save token or user info
+      if (data.message === "User created successfully") {
+        console.log(data.message);
+        alert(data.message)
+        navigate("/sign-in");
+      } else {
+        alert("This username already exists. Please pick another.")
+      }
     } catch (error) {
         console.log(error)
       alert("No account found. Sign up here!")

@@ -1,4 +1,3 @@
-
 import './css/SignIn.css'
 import React, { useState } from 'react';
 import NavBar from './Components/NavBar';
@@ -9,18 +8,6 @@ const SignIn = ({ onSignIn }) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [isInvalid, setIsInvalid] = useState(false);
-  
-  function InvalidCredentials(isInvalid) {
-    if (isInvalid) {
-      return (
-        <div className="invalidBox">
-          <p>Your credentials are invalid. Please try again. </p>
-        </div>
-      )
-    }
-  }
-
 
   const handleSignIn = async () => {
     try {
@@ -31,6 +18,7 @@ const SignIn = ({ onSignIn }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
+        credentials: 'include'
       });
   
       if (!response.ok) {
@@ -45,7 +33,7 @@ const SignIn = ({ onSignIn }) => {
         navigate("/saved-recipes");
       } else {
         console.log(data.message);
-        setIsInvalid(true);
+        alert("Your credentials are invalid. Please try again.")
       }
   
     } catch (error) {
@@ -75,7 +63,7 @@ const SignIn = ({ onSignIn }) => {
               />
               <button onClick={handleSignIn}>Sign In</button>
           </div>
-          <InvalidCredentials isInvalid={isInvalid} />
+          
       </div>
       
     </div>
