@@ -8,16 +8,20 @@ import os
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/nutrition": {"origins": "http://localhost:3000"}, r"/ingredients": {"origins": "http://localhost:3000"},
-                     r"/signin": {"origins": "http://localhost:3000/sign-in"}, r"/is-signed-in": {"origins": "http://localhost:3000/saved-recipes"}
-                     , r"/is-signed-in": {"origins": "http://localhost:3000/"}, r"/logout": {"origins": "http://localhost:3000/log-out", }
-                     ,  r"/save-recipe": {"origins": "http://localhost:3000/"}})
+CORS(app, resources={r"/nutrition": {"origins": "http://localhost:3000"}, 
+                     r"/ingredients": {"origins": "http://localhost:3000"},
+                     r"/signin": {"origins": "http://localhost:3000/sign-in"}, 
+                     r"/is-signed-in": {"origins": "http://localhost:3000/saved-recipes"}, 
+                     r"/is-signed-in": {"origins": "http://localhost:3000/"}, 
+                     r"/logout": {"origins": "http://localhost:3000/log-out"},  
+                     r"/get-saved-recipes": {"origins": "http://localhost:3000/saved-recipes"}})
 
 app.config.update(
     SESSION_COOKIE_SAMESITE='None',
     SESSION_COOKIE_SECURE=True
 )
 
+userInSession = 0
 
 
 # MongoDB connection
@@ -25,6 +29,7 @@ uri = "mongodb+srv://weewoo0413:wqqdy8fq4@cluster0.lbqcyam.mongodb.net/?retryWri
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 db = client.get_database("Foodiez2")  # Replace with your database name
+recipes_collection = db.get_collection("recipes")
 users_collection = db.get_collection("users")  # Collection to store user data
 
 app.secret_key = os.urandom(24)  # Required to sign the session cookie
@@ -39,30 +44,42 @@ try:
 except Exception as e:
     print(e)
 
+@app.route('/get-saved-recipes', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type','application/json'], supports_credentials=True  )
+def getSavedRecipes():
+    global userInSession
+    # Query the recipes collection for all recipes with the username in userInSession
+    saved_recipes = list(recipes_collection.find({"username": userInSession}))
+
+    # Remove the MongoDB ObjectId from the results (optional)
+    for recipe in saved_recipes:
+        recipe['_id'] = str(recipe['_id'])  # Convert ObjectId to string, if you want to return it
+    print (saved_recipes)
+    return saved_recipes, 200
+
 @app.route('/is-signed-in', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type','application/json'], supports_credentials=True  )
 def user():
-    print(session)
-    print(session.get('user'))
-    if "user" in session:
-        user = session["user"]
-        print(session)
-        return jsonify({"isLoggedIn": True, "username": user})
+    global userInSession
+    print(userInSession)
+    if userInSession != 0:
+        print(userInSession)
+        return jsonify({"isLoggedIn": True, "username": userInSession})
     else: 
         return jsonify({"isLoggedIn": False})
 
 @app.route('/logout', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type','application/json'], supports_credentials=True)
 def logout():
-    session.pop('user', None)
-    session.modified = True  # Ensure the session is marked as modified
-    print("popped")
-    print(session)
+    global userInSession
+    userInSession = 0
+    print(userInSession)
     return jsonify({"message": "Sign-out successful"}), 200
 
 @app.route('/signin', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type','application/json'], supports_credentials=True)
 def signin():
+    global userInSession
     print(session)
     print("sign in received")
     data = request.json
@@ -76,11 +93,10 @@ def signin():
 
     if user and user["password"] == password:
         print("yes have")
-        session['user'] = username  # Store the username in session
-        print(session.get('user'))
-        print(session)
+        userInSession = username  # Store the username in session
+        print(userInSession)
         response = jsonify({"message": "Sign-in successful"}), 200
-        return response;
+        return response
     elif user:
         print("inavlid")
         return jsonify({"message": "Invalid credentials"}), 200
@@ -97,7 +113,16 @@ def home():
 @app.route('/save-recipe', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type','application/json'])
 def saveRecipe():
+    global userInSession
     print(request.json)
+    print(userInSession)
+       # Add the username from userInSession to the recipe data
+    recipe_data = request.json
+    recipe_data['username'] = userInSession
+    print(recipe_data)
+    # Insert the recipe data into the recipes collection
+    recipes_collection.insert_one(recipe_data)
+    return jsonify("good job"), 200
 
 @app.route('/ingredients', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type','application/json'])

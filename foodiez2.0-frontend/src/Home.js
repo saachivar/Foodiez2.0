@@ -107,7 +107,7 @@ export default function Home() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(recipeLink,recipeName,recipeDescription,nutritionInfo)
+          body: JSON.stringify({recipeLink,recipeName,ingredients,recipeDescription,nutritionInfo})
         })
         .then(response => {
           if (!response.ok) {
@@ -116,12 +116,8 @@ export default function Home() {
           return response.json();
         })
         .then(data => {
-          if (Array.isArray(data)) {
-            // Join the array elements with a newline character
-            setIngredients(data.join('\n'));
-          } else {
-            alert('Failed to get ingredients');
-          }
+          navigate("/saved-recipes")
+          
         })
         .catch(error => {
           console.error('There was a problem with your fetch operation:', error);
